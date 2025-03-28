@@ -1,0 +1,54 @@
+# Binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+combine-mcp
+test_shortcut
+test_*
+!test_cursor.sh
+
+# Sensitive files
+*.pem
+*.key
+*.env
+.env
+
+# Log files
+logs/
+*.log
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Go specific
+vendor/
+go.work
+
+# macOS specific
+.DS_Store
+
+# Testing and debugging files
+tmp/
+**/coverage.out
+.cover/
+
+# Config files containing sensitive data
+config.json
+config.local.json
+config.dev.json
+config.*.json
+!config.example.json
+
+# mcp-go package is a dependency, not part of this repo
+mcp-go/
+
+# Local development scripts not needed in the public repo
+run_debug.sh
+*_restart.sh 

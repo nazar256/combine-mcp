@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "shortcut": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@shortcut/mcp"
+      ],
+      "env": {
+        "SHORTCUT_API_TOKEN": "your-shortcut-api-token-here"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "your-github-token-here"
+      }
+    }
+  }
+} 
