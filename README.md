@@ -2,6 +2,10 @@
 
 An MCP (Model Context Protocol) aggregator that allows you to combine multiple MCP servers into a single interface. The code is mostly AI-generated.
 
+## Why combine MCP servers into one?
+
+The primary reason for this app was to work around Cursor's limitation of only being able to use 2 MCP server at a time. No matter which, in my case when I added 3rd MCP server, it would break the ability to use one of other two.
+
 ## Overview
 
 The MCP Aggregator acts as a bridge between Cursor (or any other MCP client) and multiple MCP servers. It functions both as an MCP server (when talking to Cursor) and as an MCP client (when talking to backend MCP servers).
@@ -19,7 +23,6 @@ Key features:
 ### Prerequisites
 
 - Go 1.21 or higher
-- [mcp-go](https://github.com/mark3labs/mcp-go) package
 
 ### Using go install (recommended)
 
@@ -49,9 +52,10 @@ make clean
 
 ## Usage
 
-When connecting this aggregator (i.e. in Cursor, Windsurf or Claude), configure the aggregator using the `MCP_CONFIG` environment variable, which should point to a JSON configuration file.
+### Configure the aggregator
 
-Example configuration file (`config.example.json`):
+Basically you can copy existing Cursor MCP config to a location of your choice, let's say `~/.config/mcp/config.json`. It should look like this:
+
 ```json
 {
   "mcpServers": {
@@ -67,6 +71,23 @@ Example configuration file (`config.example.json`):
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_TOKEN": "your-github-token-here"  
+      }
+    }
+  }
+}
+```
+
+### Configure the aggregator in Cursor
+
+Now in Cursor config you may leave the only one MCP server - aggregator. The config may look like this (assuming you have `combine-mcp` binary is instlaled your PATH and you have `~/.config/mcp/config.json` file):
+
+```json
+{
+  "mcpServers": {
+    "aggregator": {
+      "command": "combine-mcp",
+      "env": {
+        "MCP_CONFIG": "~/.config/mcp/config.json"
       }
     }
   }
