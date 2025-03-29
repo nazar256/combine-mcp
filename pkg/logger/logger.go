@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yn/combine-mcp/pkg/config"
+	"github.com/nazar256/combine-mcp/pkg/config"
 )
 
 var (

@@ -9,8 +9,8 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
-	"github.com/yn/combine-mcp/pkg/aggregator"
-	"github.com/yn/combine-mcp/pkg/logger"
+	"github.com/nazar256/combine-mcp/pkg/aggregator"
+	"github.com/nazar256/combine-mcp/pkg/logger"
 )
 
 // AggregatorServer represents the MCP server that aggregates tools from multiple MCP servers

@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/yn/combine-mcp/pkg/aggregator"
-	"github.com/yn/combine-mcp/pkg/config"
-	"github.com/yn/combine-mcp/pkg/logger"
-	"github.com/yn/combine-mcp/pkg/stdio"
+	"github.com/nazar256/combine-mcp/pkg/aggregator"
+	"github.com/nazar256/combine-mcp/pkg/config"
+	"github.com/nazar256/combine-mcp/pkg/logger"
+	"github.com/nazar256/combine-mcp/pkg/stdio"
 )
 
 const (

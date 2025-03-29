@@ -11,8 +11,8 @@ import (
 
 	"github.com/mark3labs/mcp-go/client"
 	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/yn/combine-mcp/pkg/config"
-	"github.com/yn/combine-mcp/pkg/logger"
+	"github.com/nazar256/combine-mcp/pkg/config"
+	"github.com/nazar256/combine-mcp/pkg/logger"
 )
 
 // MCPAggregator is responsible for aggregating multiple MCP servers
