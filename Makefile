@@ -1,7 +1,7 @@
 .PHONY: build test clean run example
 
 build:
-	go build -o combine-mcp ./cmd
+	go build -o combine-mcp ./cmd/combine-mcp
 
 test:
 	go test ./...

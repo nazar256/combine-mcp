@@ -28,7 +28,7 @@ Key features:
 
 ```bash
 # Install directly from GitHub (binary will be placed in $GOPATH/bin)
-go install github.com/nazar256/combine-mcp/cmd@latest
+go install github.com/nazar256/combine-mcp/cmd/combine-mcp@latest
 
 # Ensure $GOPATH/bin is in your PATH
 # For example, add this to your .bashrc or .zshrc:
