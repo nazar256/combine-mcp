@@ -10,11 +10,11 @@ edition = "2021"
 mcp-sdk = "0.0.3" # Using AntigmaLabs SDK as chosen
 
 # Async Runtime
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.33.0", features = ["full"] }
 
 # Serialization / Deserialization
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.178", features = ["derive"] }
+serde_json = "1.0.104"
 
 # Configuration - Fixed version and features
 config = "0.13.3"
@@ -23,14 +23,19 @@ config = "0.13.3"
 dotenvy = "0.15"
 
 # Logging
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tracing-appender = "0.2" # For file logging
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
+tracing-appender = "0.2.2" # For file logging
 
 # Error Handling
-anyhow = "1.0"
-thiserror = "1.0"
+anyhow = "1.0.75"
+thiserror = "1.0.46"
 
 # Utilities
-futures = "0.3" # For stream handling if needed by mcp-sdk or async logic
-regex = "1" # For tool name sanitization/mapping if needed, though replace might suffice 
+futures = "0.3.28" # For stream handling if needed by mcp-sdk or async logic
+regex = "1" # For tool name sanitization/mapping if needed, though replace might suffice
+url = "2.4.0"
+idna = "0.3.0"
+
+[dev-dependencies]
+tempfile = "3.9.0" 

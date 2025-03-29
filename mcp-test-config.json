@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "combine-mcp": {
+      "command": "./target/release/combine-mcp-rust",
+      "args": [],
+      "env": {
+        "MCP_CONFIG_PATH": "/home/i/.config/mcp/config.json"
+      }
+    }
+  }
+} 
