@@ -1,0 +1,36 @@
+[package]
+name = "combine-mcp-rust" # Using a temporary name to avoid conflict
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# MCP SDK
+mcp-sdk = "0.0.3" # Using AntigmaLabs SDK as chosen
+
+# Async Runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization / Deserialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Configuration - Fixed version and features
+config = "0.13.3"
+
+# Environment variable support
+dotenvy = "0.15"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2" # For file logging
+
+# Error Handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Utilities
+futures = "0.3" # For stream handling if needed by mcp-sdk or async logic
+regex = "1" # For tool name sanitization/mapping if needed, though replace might suffice 

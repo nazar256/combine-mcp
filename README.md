@@ -1,10 +1,10 @@
 # MCP Aggregator
 
-An MCP (Model Context Protocol) aggregator that allows you to combine multiple MCP servers into a single interface. The code is mostly AI-generated.
+An MCP (Model Context Protocol) aggregator that allows you to combine multiple MCP servers into a single interface. 
 
 ## Why combine MCP servers into one?
 
-The primary reason for this app was to work around Cursor's limitation of only being able to use 2 MCP servers at a time. No matter which, in my case when I added 3rd MCP server, it was breaking the ability to use one of other two.
+The primary reason for this app was to work around Cursor's limitation of only being able to use 2 MCP servers at a time. When adding a 3rd MCP server, it breaks the ability to use one of the other two.
 
 ## Overview
 
@@ -20,11 +20,13 @@ Key features:
 
 ## Installation
 
-### Prerequisites
+### Go Implementation (Stable)
+
+#### Prerequisites
 
 - Go 1.21 or higher
 
-### Using go install (recommended)
+#### Using go install (recommended)
 
 ```bash
 # Install directly from GitHub (binary will be placed in $GOPATH/bin)
@@ -35,7 +37,7 @@ go install github.com/nazar256/combine-mcp/cmd/combine-mcp@latest
 # export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
-### Using the Makefile
+#### Using the Makefile
 
 The project includes a Makefile for common tasks:
 
@@ -48,6 +50,33 @@ make test
 
 # Clean up build artifacts
 make clean
+```
+
+### Rust Implementation (In Development)
+
+#### Prerequisites
+
+- Rust 1.70 or higher (with Cargo)
+
+#### Building from source
+
+```bash
+# Clone the repository
+git clone https://github.com/nazar256/combine-mcp.git
+cd combine-mcp
+
+# Build the Rust implementation
+cargo build --release
+
+# Run the executable
+./target/release/combine-mcp-rust
+```
+
+#### Running tests
+
+```bash
+# Run the tests
+cargo test
 ```
 
 ## Usage
@@ -79,7 +108,7 @@ Basically you can copy existing Cursor MCP config to a location of your choice, 
 
 ### Configure the aggregator in Cursor
 
-Now in Cursor config you may leave the only one MCP server - aggregator. The config may look like this (assuming you have `combine-mcp` binary is instlaled your PATH and you have `~/.config/mcp/config.json` file):
+Now in Cursor config you may leave the only one MCP server - aggregator. The config may look like this (assuming you have `combine-mcp` binary is installed in your PATH and you have `~/.config/mcp/config.json` file):
 
 ```json
 {
@@ -113,15 +142,17 @@ For example:
 
 The sanitization is transparent - when you call a tool using the sanitized name, the aggregator maps it back to the original name when forwarding the request to the backend server.
 
-
 ### Testing
 
 For testing purposes, use:
 
 ```bash
+# Go implementation
 make test
-```
 
+# Rust implementation
+cargo test
+```
 
 ## License
 

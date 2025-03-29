@@ -31,6 +31,13 @@ logs/
 vendor/
 go.work
 
+# Rust specific
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+!Cargo.lock # Keep Cargo.lock for binary projects
+
 # macOS specific
 .DS_Store
 
