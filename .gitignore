@@ -5,7 +5,7 @@
 *.so
 *.dylib
 main
-combine-mcp
+/combine-mcp
 test_shortcut
 test_*
 !test_cursor.sh
