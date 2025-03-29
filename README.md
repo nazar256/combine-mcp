@@ -4,7 +4,7 @@ An MCP (Model Context Protocol) aggregator that allows you to combine multiple M
 
 ## Why combine MCP servers into one?
 
-The primary reason for this app was to work around Cursor's limitation of only being able to use 2 MCP server at a time. No matter which, in my case when I added 3rd MCP server, it would break the ability to use one of other two.
+The primary reason for this app was to work around Cursor's limitation of only being able to use 2 MCP servers at a time. No matter which, in my case when I added 3rd MCP server, it was breaking the ability to use one of other two.
 
 ## Overview
 
