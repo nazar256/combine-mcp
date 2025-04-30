@@ -56,6 +56,8 @@ make clean
 
 Basically you can copy existing Cursor MCP config to a location of your choice, let's say `~/.config/mcp/config.json`. It should look like this:
 
+Nice feature for Cursor users is filtering tools from MCP servers. You can manage tools to not reach the limit of 40 tools in Cursor and not expose the ones you don't want Cursor to use.
+
 ```json
 {
   "mcpServers": {
@@ -64,6 +66,9 @@ Basically you can copy existing Cursor MCP config to a location of your choice, 
       "args": ["-y", "@shortcut/mcp"],
       "env": {
         "SHORTCUT_API_TOKEN": "your-shortcut-api-token-here"
+      },
+      "tools": {
+        "allowed": ["search-stories", "get-story", "create-story"]
       }
     },
     "github": {
@@ -113,16 +118,49 @@ For example:
 
 The sanitization is transparent - when you call a tool using the sanitized name, the aggregator maps it back to the original name when forwarding the request to the backend server.
 
+### Tool Filtering
 
-### Testing
+The MCP Aggregator supports optional tool filtering per server. This is useful when you want to:
+- Limit the number of exposed tools to stay within Cursor's tool limit (40 tools maximum)
+- Only expose specific tools from each server
+- Avoid tool name conflicts between servers
+- Improve performance by reducing the number of tools to process
 
-For testing purposes, use:
+To enable tool filtering, add a `tools` object to your server configuration with an `allowed` array listing the tools you want to expose:
 
-```bash
-make test
+```json
+{
+  "mcpServers": {
+    "shortcut": {
+      "command": "npx",
+      "args": ["-y", "@shortcut/mcp"],
+      "env": {
+        "SHORTCUT_API_TOKEN": "your-shortcut-api-token-here"
+      },
+      "tools": {
+        "allowed": [
+          "search-stories",
+          "get-story",
+          "create-story",
+          "assign-current-user-as-owner"
+        ]
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "your-github-token-here"
+      },
+      "tools": {
+        "allowed": [
+          "create-pr",
+          "list-prs",
+          "get-pr",
+          "merge-pr"
+        ]
+      }
+    }
+  }
+}
 ```
-
-
-## License
-
-MIT 

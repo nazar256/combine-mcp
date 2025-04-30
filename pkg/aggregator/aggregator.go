@@ -15,10 +15,19 @@ import (
 	"github.com/nazar256/combine-mcp/pkg/logger"
 )
 
+// MCPClient is an interface that matches the methods we use from StdioMCPClient
+type MCPClient interface {
+	Initialize(ctx context.Context, request mcp.InitializeRequest) (*mcp.InitializeResult, error)
+	ListTools(ctx context.Context, request mcp.ListToolsRequest) (*mcp.ListToolsResult, error)
+	CallTool(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error)
+	Close() error
+}
+
 // MCPAggregator is responsible for aggregating multiple MCP servers
 type MCPAggregator struct {
-	clients map[string]*client.StdioMCPClient
+	clients map[string]MCPClient
 	tools   map[string]toolMapping
+	configs map[string]*config.ServerConfig
 	mu      sync.RWMutex
 }
 
@@ -33,16 +42,28 @@ func sanitizeToolName(name string) string {
 	return strings.ReplaceAll(name, "-", "_")
 }
 
+// normalizeToolName normalizes a tool name by replacing both dashes and underscores with underscores
+func normalizeToolName(name string) string {
+	name = strings.ReplaceAll(name, "-", "_")
+	return name
+}
+
 // NewMCPAggregator creates a new MCPAggregator
 func NewMCPAggregator() *MCPAggregator {
 	return &MCPAggregator{
-		clients: make(map[string]*client.StdioMCPClient),
+		clients: make(map[string]MCPClient),
 		tools:   make(map[string]toolMapping),
+		configs: make(map[string]*config.ServerConfig),
 	}
 }
 
 // Initialize initializes connections to all configured MCP servers
 func (a *MCPAggregator) Initialize(ctx context.Context, cfg *config.Config) error {
+	// Initialize logger with config
+	if err := logger.Init(cfg.LogLevel, cfg.LogFile); err != nil {
+		return fmt.Errorf("failed to initialize logger: %w", err)
+	}
+
 	// Override the os.Stdout during initialization to redirect it to stderr
 	// This prevents any subprocess output from corrupting our JSON stdout
 	oldStdout := os.Stdout
@@ -82,6 +103,11 @@ func (a *MCPAggregator) Initialize(ctx context.Context, cfg *config.Config) erro
 	}()
 
 	for _, serverCfg := range cfg.Servers {
+		// Store server config for filtering
+		a.mu.Lock()
+		a.configs[serverCfg.Name] = &serverCfg
+		a.mu.Unlock()
+
 		// Convert environment variables to string array format
 		var envVars []string
 		for key, value := range serverCfg.Env {
@@ -168,6 +194,7 @@ func (a *MCPAggregator) Initialize(ctx context.Context, cfg *config.Config) erro
 func (a *MCPAggregator) discoverTools(ctx context.Context, serverName string) error {
 	a.mu.RLock()
 	mcpClient, exists := a.clients[serverName]
+	serverConfig := a.configs[serverName]
 	a.mu.RUnlock()
 
 	if !exists {
@@ -182,14 +209,43 @@ func (a *MCPAggregator) discoverTools(ctx context.Context, serverName string) er
 	}
 	logger.Debug("Found %d tools for server %s", len(toolsResp.Tools), serverName)
 
+	// Create a map of allowed tools for faster lookup
+	allowedTools := make(map[string]bool)
+	if serverConfig != nil && serverConfig.Tools != nil {
+		logger.Debug("Tool filtering enabled for server %s", serverName)
+		for _, tool := range serverConfig.Tools.Allowed {
+			normalizedName := normalizeToolName(tool)
+			logger.Debug("Adding allowed tool: %s (normalized: %s)", tool, normalizedName)
+			allowedTools[normalizedName] = true
+		}
+		// If Tools config exists but allowed list is empty, no tools should be exposed
+		if len(serverConfig.Tools.Allowed) == 0 {
+			logger.Debug("Empty allowed tools list for server %s, no tools will be exposed", serverName)
+			return nil
+		}
+	} else {
+		logger.Debug("No tool filtering configured for server %s", serverName)
+	}
+
 	// Register each tool with a prefix
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	sanitizedServerName := sanitizeToolName(serverName)
 	for _, tool := range toolsResp.Tools {
+		// Skip if tool filtering is enabled and tool is not in allowed list
+		if len(allowedTools) > 0 {
+			normalizedName := normalizeToolName(tool.Name)
+			if !allowedTools[normalizedName] {
+				logger.Debug("Skipping tool %s (normalized: %s) as it's not in allowed list for server %s", tool.Name, normalizedName, serverName)
+				continue
+			}
+			logger.Debug("Including allowed tool %s (normalized: %s) for server %s", tool.Name, normalizedName, serverName)
+		}
+
 		originalName := tool.Name
 		sanitizedName := sanitizeToolName(originalName)
-		prefixedName := fmt.Sprintf("%s_%s", serverName, sanitizedName)
+		prefixedName := fmt.Sprintf("%s_%s", sanitizedServerName, sanitizedName)
 
 		logger.Debug("Registering tool: %s -> %s (sanitized from: %s)", originalName, prefixedName, tool.Name)
 

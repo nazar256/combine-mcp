@@ -30,12 +30,18 @@ const (
 	LogLevelTrace
 )
 
+// ToolsConfig represents the tool filtering configuration for a server
+type ToolsConfig struct {
+	Allowed []string `json:"allowed,omitempty"`
+}
+
 // ServerConfig represents the configuration for a single MCP server
 type ServerConfig struct {
 	Name    string            `json:"name"`
 	Command string            `json:"command"`
 	Args    []string          `json:"args,omitempty"`
 	Env     map[string]string `json:"env,omitempty"`
+	Tools   *ToolsConfig      `json:"tools,omitempty"` // Optional tool filtering
 }
 
 // Config represents the complete configuration for the MCP aggregator
@@ -54,6 +60,7 @@ type rawConfig struct {
 		Command string            `json:"command"`
 		Args    []string          `json:"args,omitempty"`
 		Env     map[string]string `json:"env,omitempty"`
+		Tools   *ToolsConfig      `json:"tools,omitempty"`
 	} `json:"mcpServers"`
 }
 
@@ -131,6 +138,7 @@ func LoadConfig(envVar string) (*Config, error) {
 				Command: server.Command,
 				Args:    server.Args,
 				Env:     server.Env,
+				Tools:   server.Tools,
 			})
 		}
 	}
