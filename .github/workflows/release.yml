@@ -1,0 +1,117 @@
+name: Release Binaries
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag to build for (e.g., v1.0.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Determine tag to use
+        id: get_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          fi
+          echo "Using tag: ${{ env.TAG_NAME }}"
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          mkdir -p ./bin
+          BINARY_NAME=combine-mcp
+          OUTPUT_FILE=${BINARY_NAME}-${{ matrix.goos }}-${{ matrix.goarch }}
+          
+          echo "Building $OUTPUT_FILE..."
+          go build -v -o ./bin/${OUTPUT_FILE} ./cmd/combine-mcp/
+          
+          # Generate checksum before compression
+          cd ./bin
+          sha256sum ${OUTPUT_FILE} > ${OUTPUT_FILE}.sha256
+          
+          # Compress binary
+          echo "Compressing $OUTPUT_FILE..."
+          if [[ "${{ matrix.goos }}" == "darwin" || "${{ matrix.goos }}" == "linux" ]]; then
+            gzip -9 -c ${OUTPUT_FILE} > ${OUTPUT_FILE}.gz
+          fi
+
+      - name: Upload binary as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: ./bin/combine-mcp-${{ matrix.goos }}-${{ matrix.goarch }}.gz
+          
+      - name: Upload checksum as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksum-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: ./bin/combine-mcp-${{ matrix.goos }}-${{ matrix.goarch }}.sha256
+
+  attach-to-release:
+    name: Attach binaries to release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+          
+      - name: List artifacts
+        run: find ./artifacts -type f | sort
+        
+      - name: Prepare release files
+        run: |
+          mkdir -p ./release-files
+          find ./artifacts -type f -name "combine-mcp-*" -exec cp {} ./release-files/ \;
+          find ./release-files -type f | sort
+      
+      - name: Determine tag to use
+        id: get_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          fi
+          echo "Using tag: ${{ env.TAG_NAME }}"
+          
+      - name: Attach artifacts to release if triggered by release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./release-files/*
+          
+      - name: Attach artifacts to release if triggered manually
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: ./release-files/* 

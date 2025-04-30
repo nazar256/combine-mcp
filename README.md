@@ -20,11 +20,26 @@ Key features:
 
 ## Installation
 
-### Prerequisites
+### Using install script (recommended)
 
-- Go 1.21 or higher
+You can install the latest version of combine-mcp using our installation script:
 
-### Using go install (recommended)
+```bash
+# Download and run the installation script
+curl -fsSL https://raw.githubusercontent.com/nazar256/combine-mcp/main/install.sh | bash
+
+# Or install a specific version
+curl -fsSL https://raw.githubusercontent.com/nazar256/combine-mcp/main/install.sh | bash -s -- -v v1.0.0
+```
+
+The script will:
+- Detect your operating system and architecture
+- Download the appropriate pre-compiled binary
+- Verify the checksum
+- Install it to a suitable location in your PATH
+- Make it executable
+
+### Using go install (alternative)
 
 ```bash
 # Install directly from GitHub (binary will be placed in $GOPATH/bin)
