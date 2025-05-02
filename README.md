@@ -50,6 +50,37 @@ go install github.com/nazar256/combine-mcp/cmd/combine-mcp@latest
 # export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
+### Using Docker (alternative)
+
+You can run combine-mcp directly using Docker without installing it locally:
+
+```bash
+# Run the latest version
+docker run --rm -v ~/.config/mcp:/config ghcr.io/nazar256/combine-mcp:latest
+
+# Run a specific version
+docker run --rm -v ~/.config/mcp:/config ghcr.io/nazar256/combine-mcp:v1.0.0
+
+# Set environment variables
+docker run --rm -v ~/.config/mcp:/config -e MCP_CONFIG=/config/config.json -e MCP_LOG_LEVEL=debug ghcr.io/nazar256/combine-mcp:latest
+```
+
+To use it with Cursor, you'd need to configure the MCP server to use Docker:
+
+```json
+{
+  "mcpServers": {
+    "aggregator": {
+      "command": "docker",
+      "args": ["run", "--rm", "-v", "~/.config/mcp:/config", "ghcr.io/nazar256/combine-mcp:latest"],
+      "env": {
+        "MCP_CONFIG": "/config/config.json"
+      }
+    }
+  }
+}
+```
+
 ### Using the Makefile
 
 The project includes a Makefile for common tasks:
